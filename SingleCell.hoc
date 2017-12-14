@@ -2,11 +2,34 @@
 {load_file("BLA_template.hoc")}
 {load_file("graphics_lib.hoc")}
 
-//objref soma
+
+
+num_sites = 3 //This will be the number of synapses or electrodes to be placed
+double p[num_sites]
+
+p[0] = 0 //soma
+p[1] = 25 //dendrite 25
+p[2] = 55 //dendrite 55
+ 
 tstop = 1000 // in ms
 objref Cell
 Cell = new Cell_A()
-numdend=78
+
+//Get number of dendrites
+i=0 
+forsec Cell.basal i=i+1 
+numdend=i
+
+//Set up vectors to record voltages
+objref voltages[numdend+1],fok[numdend+1]
+
+voltages[0] = new Vector()
+voltages[0].record(&Cell.soma.v(0.5)) //Record from soma
+
+for i=0,numdend-1 {
+	voltages[i+1] = new Vector()
+	voltages[i+1].record(&Cell.dend[i].v(0.5)) //Record from dendrites
+}
 
 //////  Use this to create a current injection   ///////
 //objectvar stim
@@ -18,33 +41,45 @@ numdend=78
 
 
 ///////   Use this to create a spike train input ////////
-objectvar syn[numdend],stim, ncn[numdend]
+objectvar syn[numdend+1], stim, ncn[numdend+1]
 
-for i=0,numdend-1 {Cell.dend[i] syn[i] = new Exp2Syn(0.5)}
+Cell.soma syn[0] = new Exp2Syn(0.5) // Create synapse on soma
+for i=0,numdend-1 {Cell.dend[i] syn[i+1] = new Exp2Syn(0.5)} //Create synapses on dendrites
+
 stim = new NetStim()
 stim.interval = 100
 stim.number = 5
 stim.start = 200
-ncn[0] = new NetCon(stim, syn[0])
-ncn[0].weight = 1
 
-ncn[25] = new NetCon(stim,syn[25])
-ncn[25].weight = 1
+for i=0,num_sites-1 {
+	ncn[p[i]] = new NetCon(stim, syn[p[i]])
+	ncn[p[i]].weight = 1
+}
 /////////////////////////////////////////////////////////
-
-
 
 nrnpointmenu(stim)
 nrncontrolmenu()
 nrnsecmenu(.5,1)
 
-v_init = -82
-
-Plot1V("Cell.soma")
-Plot1V("Cell.dend[0]")
-Plot1V("Cell.dend[25]")
-PlotINa("Cell.soma")
-//Plot2V("Cell")
-//Plot3V("Cell")
+v_init = -70
 
 init()
+run()
+
+//Print soma voltage to file
+fok[0] = new File()
+fok[0].wopen("./v_out/somav.dat")
+voltages[0].printf(fok[0])
+fok[0].close()
+
+//Print dendrite voltages to files in v_out
+strdef tstr
+for i=0,numdend-1 {
+	fok[i+1] = new File()
+	sprint(tstr,"./v_out/dend%dv.dat",i+1)
+	fok[i+1].wopen(tstr)
+	voltages[i+1].printf(fok[i+1])
+	fok[i+1].close()
+}
+
+quit()

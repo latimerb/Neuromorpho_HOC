@@ -1,0 +1,6 @@
+objref f1
+
+f1 = new File()
+
+f1.ropen("BLA_template.hoc")
+

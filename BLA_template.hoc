@@ -1,7 +1,7 @@
 //Steps to convert cell builder output to usable template:
 // 1. put begintemplate and endtemplate
 // 2. call the top procedure "init"
-// 3. put public soma, dend, axon
+// 3. put public soma, dend, axon, somatic, axonal, basal
 
 
 begintemplate Cell_A
@@ -16,7 +16,7 @@ proc init() {
 }
 
 
-public soma, dend, axon
+public soma, dend, axon, somatic, axonal, basal
 create soma, dend[78], axon
 
 proc topol() { local i
