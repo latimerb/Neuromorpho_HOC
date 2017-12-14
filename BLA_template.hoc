@@ -3,7 +3,6 @@
 // 2. call the top procedure "init"
 // 3. put public soma, dend, axon, somatic, axonal, basal
 
-
 begintemplate Cell_A
 
 
@@ -1709,6 +1708,9 @@ proc biophys() {
   }
 }
 access soma
-
-//celldef()
+ 
+ 
+ 
+ 
 endtemplate Cell_A
+
