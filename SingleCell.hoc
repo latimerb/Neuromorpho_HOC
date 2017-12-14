@@ -1,0 +1,50 @@
+{load_file("nrngui.hoc")}
+{load_file("BLA_template.hoc")}
+{load_file("graphics_lib.hoc")}
+
+//objref soma
+tstop = 1000 // in ms
+objref Cell
+Cell = new Cell_A()
+numdend=78
+
+//////  Use this to create a current injection   ///////
+//objectvar stim
+//Cell.dend[0] stim = new IClamp(0.5) //creating current clamp in the middle of the soma
+//stim.del = 200 // in ms
+//stim.dur = 500 // in ms
+//stim.amp = 0.8 // in nA
+/////////////////////////////////////////////////////////
+
+
+///////   Use this to create a spike train input ////////
+objectvar syn[numdend],stim, ncn[numdend]
+
+for i=0,numdend-1 {Cell.dend[i] syn[i] = new Exp2Syn(0.5)}
+stim = new NetStim()
+stim.interval = 100
+stim.number = 5
+stim.start = 200
+ncn[0] = new NetCon(stim, syn[0])
+ncn[0].weight = 1
+
+ncn[25] = new NetCon(stim,syn[25])
+ncn[25].weight = 1
+/////////////////////////////////////////////////////////
+
+
+
+nrnpointmenu(stim)
+nrncontrolmenu()
+nrnsecmenu(.5,1)
+
+v_init = -82
+
+Plot1V("Cell.soma")
+Plot1V("Cell.dend[0]")
+Plot1V("Cell.dend[25]")
+PlotINa("Cell.soma")
+//Plot2V("Cell")
+//Plot3V("Cell")
+
+init()
