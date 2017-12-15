@@ -88,4 +88,4 @@ for i=0,numdend-1 {
 	fcurr[i+1].close()
 }
 
-quit()
+//quit()
